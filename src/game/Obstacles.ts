@@ -1,33 +1,35 @@
 import * as THREE from 'three';
-import { AABB } from '../utils/AABB.js';
+import { AABB } from './AABB';
 
 export class Obstacles {
-  constructor(scene) {
+  scene: THREE.Scene;
+  obstacles: { mesh: THREE.Group; aabb: AABB }[] = [];
+  pool: { mesh: THREE.Group; aabb: AABB }[] = [];
+
+  constructor(scene: THREE.Scene) {
     this.scene = scene;
-    this.obstacles = [];
-    this.pool = [];
   }
 
-  spawn(z) {
+  spawn(z: number) {
     let obstacle;
     if (this.pool.length > 0) {
-      obstacle = this.pool.pop();
+      obstacle = this.pool.pop()!;
       obstacle.mesh.position.set(0, 0.5, z);
     } else {
       obstacle = new THREE.Group();
       const mat = new THREE.MeshBasicMaterial({ color: 0x8B4513 });
-      // Smaller obstacle: single 1x1x1 cube
       const cube = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), mat);
-      cube.position.x = 0; // Centered
       obstacle.add(cube);
       obstacle.position.set(0, 0.5, z);
       this.scene.add(obstacle);
     }
-    this.obstacles.push({ mesh: obstacle, aabb: new AABB(obstacle.position, 1) }); // Updated AABB size to 1
+    this.obstacles.push({ mesh: obstacle, aabb: new AABB(obstacle.position, 1) });
   }
 
-  update(speed) {
-    this.obstacles.forEach(obstacle => obstacle.mesh.position.z += speed);
+  update(speed: number) {
+    this.obstacles.forEach(obstacle => {
+      obstacle.mesh.position.z += speed;
+    });
     this.obstacles = this.obstacles.filter(obstacle => {
       if (obstacle.mesh.position.z > 10) {
         this.scene.remove(obstacle.mesh);

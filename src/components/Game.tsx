@@ -7,18 +7,20 @@ import { Collectibles } from '../game/Collectibles';
 import { Collision } from '../game/Collision';
 import HUD from './HUD';
 import GameOver from './GameOver';
+import QRModal from './QRModal';
 
 const Game: React.FC = () => {
   const mountRef = useRef<HTMLDivElement>(null);
   const [gameState, setGameState] = useState<'waiting' | 'running' | 'gameOver'>('waiting');
   const [score, setScore] = useState(0);
   const [coins, setCoins] = useState(0);
+  const [isQRModalOpen, setIsQRModalOpen] = useState(false); // State for QR modal
   const playerRef = useRef<Player | null>(null);
   const pathRef = useRef<Path | null>(null);
   const obstaclesRef = useRef<Obstacles | null>(null);
   const collectiblesRef = useRef<Collectibles | null>(null);
   const collisionRef = useRef<Collision | null>(null);
-  const speedRef = useRef(0.1); // Constant speed
+  const speedRef = useRef(0.1);
   const distanceRef = useRef(0);
 
   useEffect(() => {
@@ -128,7 +130,7 @@ const Game: React.FC = () => {
       requestAnimationFrame(animate);
 
       if (gameState === 'running') {
-        distanceRef.current += speedRef.current; // Speed stays constant at 0.1
+        distanceRef.current += speedRef.current;
         setScore(Math.floor(distanceRef.current * 10));
 
         playerRef.current?.update();
@@ -164,7 +166,7 @@ const Game: React.FC = () => {
     setGameState('waiting');
     setScore(0);
     setCoins(0);
-    speedRef.current = 0.1; // Reset to constant speed
+    speedRef.current = 0.1;
     distanceRef.current = 0;
     playerRef.current?.reset();
     pathRef.current?.reset();
@@ -172,14 +174,26 @@ const Game: React.FC = () => {
     collectiblesRef.current?.reset();
   };
 
+  const toggleQRModal = () => {
+    setIsQRModalOpen(prev => !prev);
+  };
+
   return (
-    <div ref={mountRef} className="w-full h-full relative">
-      {gameState !== 'gameOver' && (
-        <HUD score={score} coins={coins} gameState={gameState} />
-      )}
-      {gameState === 'gameOver' && (
-        <GameOver score={score} onReplay={handleReplay} />
-      )}
+    <div className="w-full h-full flex flex-col">
+      {/* Title */}
+      <h1 className="text-3xl md:text-4xl text-white text-center py-2 bg-gray-800">
+        Temple Run Cube
+      </h1>
+      {/* Game Canvas */}
+      <div ref={mountRef} className="relative flex-1">
+        {gameState !== 'gameOver' && (
+          <HUD score={score} coins={coins} gameState={gameState} />
+        )}
+        {gameState === 'gameOver' && (
+          <GameOver score={score} onReplay={handleReplay} onShowQR={toggleQRModal} />
+        )}
+        {isQRModalOpen && <QRModal onClose={toggleQRModal} />}
+      </div>
     </div>
   );
 };

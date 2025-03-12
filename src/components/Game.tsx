@@ -18,7 +18,7 @@ const Game: React.FC = () => {
   const obstaclesRef = useRef<Obstacles | null>(null);
   const collectiblesRef = useRef<Collectibles | null>(null);
   const collisionRef = useRef<Collision | null>(null);
-  const speedRef = useRef(0.1);
+  const speedRef = useRef(0.1); // Constant speed
   const distanceRef = useRef(0);
 
   useEffect(() => {
@@ -128,9 +128,8 @@ const Game: React.FC = () => {
       requestAnimationFrame(animate);
 
       if (gameState === 'running') {
-        distanceRef.current += speedRef.current;
+        distanceRef.current += speedRef.current; // Speed stays constant at 0.1
         setScore(Math.floor(distanceRef.current * 10));
-        speedRef.current += 0.0001;
 
         playerRef.current?.update();
         pathRef.current?.update(speedRef.current, playerRef.current?.mesh.position.z || 0);
@@ -159,13 +158,13 @@ const Game: React.FC = () => {
       window.removeEventListener('keydown', handleKeyDown);
       mountRef.current?.removeChild(renderer.domElement);
     };
-  }, [gameState]); // Re-run effect if gameState changes
+  }, [gameState]);
 
   const handleReplay = () => {
     setGameState('waiting');
     setScore(0);
     setCoins(0);
-    speedRef.current = 0.1;
+    speedRef.current = 0.1; // Reset to constant speed
     distanceRef.current = 0;
     playerRef.current?.reset();
     pathRef.current?.reset();

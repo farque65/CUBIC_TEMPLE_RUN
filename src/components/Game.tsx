@@ -7,7 +7,7 @@ import { Collectibles } from '../game/Collectibles';
 import { Collision } from '../game/Collision';
 import HUD from './HUD';
 import GameOver from './GameOver';
-import QRModal from './QRModal';
+import QRModal from './QRmodal';
 
 const Game: React.FC = () => {
   const mountRef = useRef<HTMLDivElement>(null);
